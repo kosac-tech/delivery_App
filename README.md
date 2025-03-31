@@ -1,16 +1,36 @@
-# kosac_delivery_app
+# Kosac Delivery App
 
-A new Flutter project.
+An internal delivery management application for Kosac.
 
-## Getting Started
+## 🚀 Overview
 
-This project is a starting point for a Flutter application.
+This Flutter app is built for delivery personnel to:
+- View assigned delivery tasks
+- Track pickups and deliveries
+- Collect payments (UPI, Cash)
+- Switch between English, Hindi, and Marathi
+- Receive real-time updates via Firebase
 
-A few resources to get you started if this is your first Flutter project:
+## 🛠 Tech Stack
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Flutter** (Cross-platform mobile app framework)
+- **Firebase** (Auth, Firestore, Notifications)
+- **GitHub** (Version control and collaboration)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 👥 Team
+
+- **Girish** – Product Strategist & UX Designer  
+- **Arpit** – Developer (4th Year CSE Student)
+
+## ✅ Status
+
+Initial app scaffold complete.  
+Firebase integration next → Login, task flows, and analytics.
+
+## 📂 Folder Structure (coming soon)
+
+We'll organize the code into folders like `/screens`, `/models`, `/services`, etc.
+
+---
+
+> Built with ❤️ by the Kosac team.
