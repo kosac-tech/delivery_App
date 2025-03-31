@@ -43,7 +43,7 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
     return Scaffold(
       appBar: AppBar(title: Text('Kosac Delivery Login')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(52.0),
         child: Column(
           children: [
             TextField(
