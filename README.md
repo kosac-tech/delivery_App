@@ -19,7 +19,7 @@ This Flutter app is built for delivery personnel to:
 
 ## 👥 Team
 
-- **Girish** – Product Strategist & UX Designer  
+- **Chirag** – Product Strategist & UX Designer  
 - **Arpit** – Developer (4th Year CSE Student)
 
 ## ✅ Status
