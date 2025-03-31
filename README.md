@@ -20,7 +20,7 @@ This Flutter app is built for delivery personnel to:
 ## 👥 Team
 
 - **Chirag** – Product Strategist & UX Designer  
-- **Arpit** – Developer (4th Year CSE Student)
+- **Arpit** – Developer (4th Year CSE Student)  
 
 ## ✅ Status
 
