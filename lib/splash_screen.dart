@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'phone_login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,34 +13,35 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    // Navigate after 2 seconds
+    // Delay 2 seconds then go to language selection
     Timer(const Duration(seconds: 2), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const PhoneLoginScreen()),
-      );
+      Navigator.pushReplacementNamed(context, '/language');
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0051BA), // Kosac blue
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
+      backgroundColor: const Color(0xFF0051BA),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Spacer(),
+          Center(
+            child: Image.asset(
               'assets/kosac_delivery_app_splash_screen_logo.png',
-              width: 280,
+              width: 240,
             ),
-            const SizedBox(height: 60), // space between logo & loader
-            const CircularProgressIndicator(
-              color: Color(0xFF82D5C7), // Minty loader
+          ),
+          const Spacer(),
+          const Padding(
+            padding: EdgeInsets.only(bottom: 100),
+            child: CircularProgressIndicator(
+              color: Color(0xFF82D5C7),
               strokeWidth: 3,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
