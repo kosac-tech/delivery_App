@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'language_selection_screen.dart';
+import 'phone_login_screen.dart';
+import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,36 +15,43 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    _navigateUser();
+  }
 
-    // Delay 2 seconds then go to language selection
-    Timer(const Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, '/language');
-    });
+  Future<void> _navigateUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final hasLanguage = prefs.getBool('hasLanguage') ?? false;
+    final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+    await Future.delayed(const Duration(seconds: 2)); // Simulate splash delay
+
+    if (!hasLanguage) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LanguageSelectionScreen()),
+      );
+    } else if (!isLoggedIn) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const PhoneLoginScreen()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF0051BA),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Spacer(),
-          Center(
-            child: Image.asset(
-              'assets/kosac_delivery_app_splash_screen_logo.png',
-              width: 240,
-            ),
-          ),
-          const Spacer(),
-          const Padding(
-            padding: EdgeInsets.only(bottom: 100),
-            child: CircularProgressIndicator(
-              color: Color(0xFF82D5C7),
-              strokeWidth: 3,
-            ),
-          ),
-        ],
+    return const Scaffold(
+      backgroundColor: Color(0xFF0051BA),
+      body: Center(
+        child: CircularProgressIndicator(
+          color: Color(0xFF82D5C7),
+          strokeWidth: 3,
+        ),
       ),
     );
   }

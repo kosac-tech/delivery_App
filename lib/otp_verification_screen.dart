@@ -8,6 +8,8 @@ class OtpVerificationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController _otpController = TextEditingController();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -20,7 +22,6 @@ class OtpVerificationScreen extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        iconTheme: const IconThemeData(color: Colors.black),
         centerTitle: false,
       ),
       body: Padding(
@@ -28,33 +29,40 @@ class OtpVerificationScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 40),
+
+            // OTP Info Text
             Text(
-              tr('enter_otp', args: [phoneNumber]),
+              tr('enter_otp', namedArgs: {'phone': phoneNumber}),
               style: const TextStyle(fontSize: 16),
             ),
+
             const SizedBox(height: 20),
+
+            // OTP Input Field
             TextField(
+              controller: _otpController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 labelText: tr('otp'),
                 border: const OutlineInputBorder(),
               ),
             ),
+
             const SizedBox(height: 24),
+
+            // Verify Button
             SizedBox(
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
                 onPressed: () {
+                  // TODO: Add actual verification logic with Firebase
+                  // For now, simulate success
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(tr('login_success')),
-                      backgroundColor: const Color(0xFF0051BA),
-                    ),
+                    SnackBar(content: Text(tr('login_success'))),
                   );
-                  Future.delayed(const Duration(seconds: 1), () {
-                    Navigator.pushReplacementNamed(context, '/home');
-                  });
+
+                  Navigator.pushReplacementNamed(context, '/home');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF0051BA),
@@ -64,11 +72,7 @@ class OtpVerificationScreen extends StatelessWidget {
                 ),
                 child: Text(
                   tr('verify'),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: const TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),
             )
