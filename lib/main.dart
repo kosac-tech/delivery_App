@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
 import 'language_selection_screen.dart';
 import 'phone_login_screen.dart';
 import 'otp_verification_screen.dart'; // If needed
@@ -8,6 +9,10 @@ import 'home_screen.dart'; // Optional
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized(); // ⬅️ important
+
+  // Check the login state and language preference
+  bool isLoggedIn = await checkLoginState();
+  String languageCode = await getLanguagePreference();
 
   runApp(
     EasyLocalization(
@@ -18,13 +23,28 @@ void main() async {
       ],
       path: 'assets/lang', // ⬅️ path to your JSON files
       fallbackLocale: const Locale('en'),
-      child: const MyApp(),
+      child: MyApp(isLoggedIn: isLoggedIn, languageCode: languageCode),
     ),
   );
 }
 
+// Function to check login state from SharedPreferences
+Future<bool> checkLoginState() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getBool('isLoggedIn') ?? false;  // Defaults to false if not set
+}
+
+// Function to get the language preference from SharedPreferences
+Future<String> getLanguagePreference() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getString('language') ?? 'en';  // Defaults to 'en' if not set
+}
+
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+  final String languageCode;
+
+  MyApp({required this.isLoggedIn, required this.languageCode, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,15 +53,15 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
-      locale: context.locale,
+      locale: Locale(languageCode),  // Set the language dynamically
       theme: ThemeData(primarySwatch: Colors.blue),
       initialRoute: '/',
       routes: {
-        '/': (context) => const SplashScreen(),
+        '/': (context) => isLoggedIn ? const HomeScreen() : const SplashScreen(),
         '/language': (context) => const LanguageSelectionScreen(),
         '/login': (context) => const PhoneLoginScreen(),
-        '/otp': (context) => const OtpVerificationScreen(phoneNumber: '1234567890'), // For testing
-        '/home': (context) => const HomeScreen(), // Optional
+        '/otp': (context) => OtpVerificationScreen(phoneNumber: '1234567890'),
+        '/home': (context) => isLoggedIn ? const HomeScreen() : const PhoneLoginScreen(), // If logged in, show Home
       },
     );
   }
@@ -58,8 +78,22 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, '/language');
+    Future.delayed(const Duration(seconds: 2), () async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      bool hasLanguage = prefs.getBool('hasLanguage') ?? false;
+      
+      if (hasLanguage) {
+        // Navigate to login or home based on login state
+        bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+        if (isLoggedIn) {
+          Navigator.pushReplacementNamed(context, '/home');
+        } else {
+          Navigator.pushReplacementNamed(context, '/login');
+        }
+      } else {
+        // Navigate to language selection screen
+        Navigator.pushReplacementNamed(context, '/language');
+      }
     });
   }
 

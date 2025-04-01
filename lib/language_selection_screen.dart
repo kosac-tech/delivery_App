@@ -20,6 +20,27 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   };
 
   @override
+  void initState() {
+    super.initState();
+    _loadLanguagePreference();
+  }
+
+  // Load the saved language preference from SharedPreferences
+  _loadLanguagePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? savedLanguage = prefs.getString('selectedLanguage');
+    if (savedLanguage != null) {
+      setState(() {
+        _selectedLanguage = savedLanguage == 'en'
+            ? 'English'
+            : savedLanguage == 'hi'
+                ? 'हिंदी'
+                : 'मराठी';
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'otp_verification_screen.dart';
 
 class PhoneLoginScreen extends StatefulWidget {
@@ -11,6 +12,12 @@ class PhoneLoginScreen extends StatefulWidget {
 
 class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
+
+  // Save login state when the user presses the 'Get OTP' button
+  Future<void> saveLoginState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);  // Mark the user as logged in
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +57,11 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  // Save login state before navigating to OTP screen
+                  await saveLoginState();
+
+                  // Navigate to OTP Verification Screen
                   Navigator.push(
                     context,
                     MaterialPageRoute(

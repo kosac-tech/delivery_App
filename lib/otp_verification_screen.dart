@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OtpVerificationScreen extends StatelessWidget {
   final String phoneNumber;
 
-  const OtpVerificationScreen({super.key, required this.phoneNumber});
+  // Remove `const` from the constructor of the widget
+  OtpVerificationScreen({super.key, required this.phoneNumber});
+
+  // Non-const TextEditingController for OTP input field
+  final TextEditingController _otpController = TextEditingController();
+
+  // Save the login state after OTP verification
+  Future<void> saveLoginState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true); // Mark the user as logged in
+  }
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController _otpController = TextEditingController();
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -55,13 +64,19 @@ class OtpVerificationScreen extends StatelessWidget {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: () {
-                  // TODO: Add actual verification logic with Firebase
-                  // For now, simulate success
+                onPressed: () async {
+                  // Simulate OTP verification success
+                  // You would add actual verification logic here (e.g., using Firebase)
+
+                  // Save login state on successful OTP verification
+                  await saveLoginState();
+
+                  // Show a success message
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(tr('login_success'))),
                   );
 
+                  // Navigate to Home Screen after successful login
                   Navigator.pushReplacementNamed(context, '/home');
                 },
                 style: ElevatedButton.styleFrom(
