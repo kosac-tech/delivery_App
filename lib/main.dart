@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'phone_login_screen.dart'; // 👈 Make sure this is imported
+import 'splash_screen.dart'; // 💡 Make sure this file exists and is imported
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(); // 🔥 Initializes Firebase
+
   runApp(
-    MaterialApp(
+    const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: PhoneLoginScreen(), // 👈 This sets your login screen
+      home: SplashScreen(), // 🚀 Starts with the Splash screen
     ),
   );
 }
