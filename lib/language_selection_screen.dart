@@ -28,7 +28,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   // Load the saved language preference from SharedPreferences
   _loadLanguagePreference() async {
     final prefs = await SharedPreferences.getInstance();
-    String? savedLanguage = prefs.getString('selectedLanguage');
+    String? savedLanguage = prefs.getString('language');
     if (savedLanguage != null) {
       setState(() {
         _selectedLanguage = savedLanguage == 'en'
@@ -37,6 +37,31 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                 ? 'हिंदी'
                 : 'मराठी';
       });
+    }
+  }
+
+  Future<void> _saveLanguageAndProceed(BuildContext context) async {
+    if (_selectedLanguage != null) {
+      final locale = languageMap[_selectedLanguage!]!;
+      
+      // Save preferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('hasLanguage', true);
+      await prefs.setString('language', locale.languageCode);
+
+      // Set the locale
+      if (mounted) {
+        await context.setLocale(locale);
+        
+        // Force a rebuild of the entire app
+        if (mounted) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const PhoneLoginScreen()),
+            (route) => false,
+          );
+        }
+      }
     }
   }
 
@@ -106,24 +131,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                       borderRadius: BorderRadius.circular(40),
                     ),
                   ),
-                  onPressed: () async {
-                    if (_selectedLanguage != null) {
-                      // Set locale
-                      final locale = languageMap[_selectedLanguage!]!;
-                      context.setLocale(locale);
-
-                      // Save preference
-                      final prefs = await SharedPreferences.getInstance();
-                      await prefs.setBool('hasLanguage', true);
-                      await prefs.setString('selectedLanguage', locale.languageCode);
-
-                      // Go to OTP screen
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => const PhoneLoginScreen()),
-                      );
-                    }
-                  },
+                  onPressed: () => _saveLanguageAndProceed(context),
                   child: Text(
                     tr('next'),
                     style: const TextStyle(

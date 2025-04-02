@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
+import 'package:firebase_core/firebase_core.dart';
 import 'language_selection_screen.dart';
 import 'phone_login_screen.dart';
 import 'otp_verification_screen.dart'; // If needed
@@ -9,6 +10,7 @@ import 'home_screen.dart'; // Optional
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized(); // ⬅️ important
+  await Firebase.initializeApp(); // Initialize Firebase
 
   // Check the login state and language preference
   bool isLoggedIn = await checkLoginState();
@@ -23,6 +25,7 @@ void main() async {
       ],
       path: 'assets/lang', // ⬅️ path to your JSON files
       fallbackLocale: const Locale('en'),
+      startLocale: Locale(languageCode), // Set the initial locale
       child: MyApp(isLoggedIn: isLoggedIn, languageCode: languageCode),
     ),
   );
@@ -53,15 +56,14 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
-      locale: Locale(languageCode),  // Set the language dynamically
+      locale: context.locale, // Use context.locale instead of creating a new Locale
       theme: ThemeData(primarySwatch: Colors.blue),
       initialRoute: '/',
       routes: {
         '/': (context) => isLoggedIn ? const HomeScreen() : const SplashScreen(),
         '/language': (context) => const LanguageSelectionScreen(),
         '/login': (context) => const PhoneLoginScreen(),
-        '/otp': (context) => OtpVerificationScreen(phoneNumber: '1234567890'),
-        '/home': (context) => isLoggedIn ? const HomeScreen() : const PhoneLoginScreen(), // If logged in, show Home
+        '/home': (context) => isLoggedIn ? const HomeScreen() : const PhoneLoginScreen(),
       },
     );
   }

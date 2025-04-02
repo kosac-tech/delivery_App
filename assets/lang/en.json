@@ -11,5 +11,19 @@
   "enter_otp": "Enter the OTP sent to +91 {phone}",
   "otp": "OTP",
   "verify": "Verify",
-  "login_success": "Login Successful ✅"
+  "login_success": "Login Successful ✅",
+  "phone_required": "Please enter your phone number",
+  "phone_invalid": "Please enter a valid 10-digit phone number",
+  "verification_failed": "Verification failed",
+  "error_occurred": "An error occurred",
+  "enter_valid_otp": "Please enter a valid OTP",
+  "invalid_otp": "Invalid OTP",
+  "otp_sent_to": "OTP sent to",
+  "resend_otp": "Resend OTP",
+  "resend_otp_in": "Resend OTP in {0}s",
+  "order_summary": "Order Summary",
+  "amount_collected": "Amount Collected",
+  "total_orders": "Total Orders",
+  "completed": "Completed",
+  "pending": "Pending"
 }

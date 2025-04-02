@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'otp_verification_screen.dart';
 
 class PhoneLoginScreen extends StatefulWidget {
@@ -12,11 +13,87 @@ class PhoneLoginScreen extends StatefulWidget {
 
 class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
   final TextEditingController _phoneController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
-  // Save login state when the user presses the 'Get OTP' button
-  Future<void> saveLoginState() async {
+  // Validate phone number format
+  String? _validatePhoneNumber(String? value) {
+    if (value == null || value.isEmpty) {
+      return tr('phone_required');
+    }
+    if (value.length != 10) {
+      return tr('phone_invalid');
+    }
+    return null;
+  }
+
+  Future<void> _sendOTP() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      // Show loading indicator
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Sending OTP...'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: '+91${_phoneController.text}',
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          // Auto-verification completed (Android only)
+          await FirebaseAuth.instance.signInWithCredential(credential);
+          await _saveLoginState();
+          if (mounted) {
+            Navigator.pushReplacementNamed(context, '/home');
+          }
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(e.message ?? tr('verification_failed'))),
+            );
+          }
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          if (mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => OtpVerificationScreen(
+                  phoneNumber: _phoneController.text,
+                  verificationId: verificationId,
+                ),
+              ),
+            );
+          }
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          // Handle timeout
+        },
+        timeout: const Duration(seconds: 60),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(tr('error_occurred'))),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _saveLoginState() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', true);  // Mark the user as logged in
+    await prefs.setBool('isLoggedIn', true);
   }
 
   @override
@@ -38,56 +115,56 @@ class _PhoneLoginScreenState extends State<PhoneLoginScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 40),
-            TextField(
-              controller: _phoneController,
-              keyboardType: TextInputType.phone,
-              decoration: InputDecoration(
-                labelText: tr('phone_number'),
-                prefixText: '+91 ',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              const SizedBox(height: 40),
+              TextFormField(
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+                validator: _validatePhoneNumber,
+                decoration: InputDecoration(
+                  labelText: tr('phone_number'),
+                  prefixText: '+91 ',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () async {
-                  // Save login state before navigating to OTP screen
-                  await saveLoginState();
-
-                  // Navigate to OTP Verification Screen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => OtpVerificationScreen(
-                        phoneNumber: _phoneController.text,
-                      ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _sendOTP,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF0051BA),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0051BA),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
                   ),
-                ),
-                child: Text(
-                  tr('get_otp'),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          tr('get_otp'),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
